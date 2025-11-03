@@ -14,7 +14,7 @@ public final class PerishableParcel extends Parcel {
     }
 
     @Override
-    int getBaseCost() {
+    protected int getBaseCost() {
         return BASE_COST;
     }
 

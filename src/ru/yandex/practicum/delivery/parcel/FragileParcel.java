@@ -11,13 +11,14 @@ public final class FragileParcel extends Parcel implements Trackable{
     }
 
     @Override
-    int getBaseCost() {
+    protected int getBaseCost() {
         return BASE_COST;
     }
 
     @Override
     public void packageItem() {
         System.out.printf("Посылка <<%s>> обёрнута в защитную плёнку\n",getDescription());
+        super.packageItem();
     }
 
     @Override

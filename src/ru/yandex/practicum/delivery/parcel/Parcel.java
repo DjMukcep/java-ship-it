@@ -4,10 +4,10 @@ import java.time.LocalDate;
 
 public abstract class Parcel {
 
-    final String description;
-    final int weight;
-    final String deliveryAddress;
-    final LocalDate sendDay;
+    protected String description;
+    protected int weight;
+    protected String deliveryAddress;
+    protected LocalDate sendDay;
 
     public Parcel(String description, int weight, String deliveryAddress, LocalDate day) {
         this.description = description;
@@ -20,11 +20,11 @@ public abstract class Parcel {
         return getBaseCost() * weight;
     }
 
-    String getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    int getWeight() {
+    public int getWeight() {
         return weight;
     }
 
@@ -36,7 +36,7 @@ public abstract class Parcel {
         System.out.printf("Посылка <<%s>> доставлена по адресу %s\n", description, deliveryAddress);
     }
 
-    abstract int getBaseCost();
+    protected abstract int getBaseCost();
 
     @Override
     public String toString() {
