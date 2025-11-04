@@ -29,7 +29,7 @@ public final class PerishableParcel extends Parcel {
                 ", вес=" + weight +
                 ", адрес доставки='" + deliveryAddress + '\'' +
                 ", дата отправки='" + sendDay + '\'' +
-                ", срок годности (дней)=" + timeToLive.toDays() +
+                ", срок годности дней=" + timeToLive.toDays() +
                 '}';
     }
 }

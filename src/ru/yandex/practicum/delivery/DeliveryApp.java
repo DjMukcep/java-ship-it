@@ -4,9 +4,9 @@ import ru.yandex.practicum.delivery.parcel.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import static ru.yandex.practicum.delivery.parcel.NumericField.*;
+import static ru.yandex.practicum.delivery.parcel.StringField.*;
 
 public class DeliveryApp {
 
@@ -16,6 +16,8 @@ public class DeliveryApp {
     private static final ParcelBox<StandardParcel> standardBox = new ParcelBox<>(20);
     private static final ParcelBox<PerishableParcel> perishableBox = new ParcelBox<>(25);
     private static final ParcelBox<FragileParcel> fragileBox = new ParcelBox<>(15);
+    private static final Map<StringField, String> parcelStringFields = new HashMap<>();
+    private static final Map<NumericField, Integer> parcelNumFields = new HashMap<>();
 
     public static void main(String[] args) {
         boolean running = true;
@@ -103,80 +105,134 @@ public class DeliveryApp {
 
     private static void processBox(int box) {
         switch (box) {
-            case 1 -> {
-                if (standardBox.getAllParcels().isEmpty()) {
-                    System.out.println("Коробка стандартных посылок пуста.");
-                    return;
-                }
-                System.out.println("Коробка со стандартными посылками:");
-                System.out.println(standardBox.getAllParcels());
-            }
-            case 2 -> {
-                if (perishableBox.getAllParcels().isEmpty()) {
-                    System.out.println("Коробка скоропортящихся посылок пуста.");
-                    return;
-                }
-                System.out.println("Коробка со скоропортящимися посылками:");
-                System.out.println(perishableBox.getAllParcels());
-            }
-            case 3 -> {
-                if (fragileBox.getAllParcels().isEmpty()) {
-                    System.out.println("Коробка с хрупкими посылками пуста.");
-                    return;
-                }
-                System.out.println("Коробка с хрупкими посылками:");
-                System.out.println(fragileBox.getAllParcels());
-            }
+            case 1 -> processStandardBox();
+            case 2 -> processPerishableBox();
+            case 3 -> processFragileBox();
             default -> System.out.println("Неверный выбор.");
         }
     }
 
+    private static void processStandardBox() {
+        if (standardBox.getAllParcels().isEmpty()) {
+            System.out.println("Коробка стандартных посылок пуста.");
+            return;
+        }
+        System.out.println("Коробка со стандартными посылками:");
+        System.out.println(standardBox.getAllParcels());
+    }
+
+    private static void processPerishableBox() {
+        if (perishableBox.getAllParcels().isEmpty()) {
+            System.out.println("Коробка скоропортящихся посылок пуста.");
+            return;
+        }
+        System.out.println("Коробка со скоропортящимися посылками:");
+        System.out.println(perishableBox.getAllParcels());
+    }
+
+    private static void processFragileBox() {
+        if (fragileBox.getAllParcels().isEmpty()) {
+            System.out.println("Коробка с хрупкими посылками пуста.");
+            return;
+        }
+        System.out.println("Коробка с хрупкими посылками:");
+        System.out.println(fragileBox.getAllParcels());
+    }
+
     private static void processUserInput(int parcelType) {
+        setDescription();
+        setWeight();
+        setDeliveryAddress();
+        setDeliveryDay();
+        setTimeToLive(parcelType);
+        processParcel(parcelType);
+    }
+    private static void setDescription() {
         System.out.print("Описание: ");
         String description = scanner.nextLine();
+        parcelStringFields.put(DESCRIPTION, description);
+    }
+
+    private static void setWeight() {
         System.out.print("Вес: ");
         int weight = Integer.parseInt(scanner.nextLine());
+        parcelNumFields.put(WEIGHT, weight);
+    }
+
+    private static void setDeliveryAddress() {
         System.out.print("Адрес доставки: ");
         String deliveryAddress = scanner.nextLine();
+        parcelStringFields.put(DELIVERY_ADDRESS, deliveryAddress);
+    }
+
+    private static void setDeliveryDay() {
         System.out.print("День отправки: ");
         int sendDay = Integer.parseInt(scanner.nextLine());
+        parcelNumFields.put(SEND_DAY, sendDay);
+    }
+
+    private static void setTimeToLive(int parcelType) {
+        if (parcelType == 2) {
+            System.out.print("Срок годности дней: ");
+            int timeToLive = Integer.parseInt(scanner.nextLine());
+            parcelNumFields.put(TIME_TO_LIVE, timeToLive);
+        }
+    }
+
+    private static void processParcel(int parcelType) {
         switch (parcelType) {
-            case 1 -> {
-                StandardParcel standard = new StandardParcel(
-                        description,
-                        weight,
-                        deliveryAddress,
-                        LocalDate.of(2025, Month.NOVEMBER, sendDay)
-                );
-                allParcels.add(standard);
-                standardBox.addParcel(standard);
-            }
-            case 2 -> {
-                System.out.print("Срок годности дней: ");
-                int timeToLive = Integer.parseInt(scanner.nextLine());
-                PerishableParcel perishable = new PerishableParcel(
-                        description,
-                        weight,
-                        deliveryAddress,
-                        LocalDate.of(2025, Month.NOVEMBER, sendDay),
-                        Duration.ofDays(timeToLive)
-                );
-                allParcels.add(perishable);
-                perishableBox.addParcel(perishable);
-            }
-            case 3 -> {
-                FragileParcel fragile = new FragileParcel(
-                        description,
-                        weight,
-                        deliveryAddress,
-                        LocalDate.of(2025, Month.NOVEMBER, sendDay)
-                );
-                allParcels.add(fragile);
-                trackables.add(fragile);
-                fragileBox.addParcel(fragile);
-            }
+            case 1 -> processStandardParcel();
+            case 2 -> processPerishableParcel();
+            case 3 -> processFragileParcel();
             default -> System.out.println("Неверный выбор.");
         }
+    }
+
+    private static void processStandardParcel() {
+        StandardParcel standard = createStandardParcel();
+        allParcels.add(standard);
+        standardBox.addParcel(standard);
+    }
+
+    private static void processPerishableParcel() {
+        PerishableParcel perishable = createPerishableParcel();
+        allParcels.add(perishable);
+        perishableBox.addParcel(perishable);
+    }
+
+    private static void processFragileParcel() {
+        FragileParcel fragile = createFragileParcel();
+        allParcels.add(fragile);
+        trackables.add(fragile);
+        fragileBox.addParcel(fragile);
+    }
+
+    private static StandardParcel createStandardParcel() {
+        return new StandardParcel(
+                parcelStringFields.get(DESCRIPTION),
+                parcelNumFields.get(WEIGHT),
+                parcelStringFields.get(DELIVERY_ADDRESS),
+                LocalDate.of(2025, Month.NOVEMBER, parcelNumFields.get(SEND_DAY))
+        );
+    }
+
+    private static PerishableParcel createPerishableParcel() {
+        return new PerishableParcel(
+                parcelStringFields.get(DESCRIPTION),
+                parcelNumFields.get(WEIGHT),
+                parcelStringFields.get(DELIVERY_ADDRESS),
+                LocalDate.of(2025, Month.NOVEMBER, parcelNumFields.get(SEND_DAY)),
+                Duration.ofDays(parcelNumFields.get(TIME_TO_LIVE))
+        );
+    }
+
+    private static FragileParcel createFragileParcel() {
+        return new FragileParcel(
+                parcelStringFields.get(DESCRIPTION),
+                parcelNumFields.get(WEIGHT),
+                parcelStringFields.get(DELIVERY_ADDRESS),
+                LocalDate.of(2025, Month.NOVEMBER, parcelNumFields.get(SEND_DAY))
+        );
     }
 }
 
